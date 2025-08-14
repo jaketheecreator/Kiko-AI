@@ -554,7 +554,8 @@ function Homepage() {
               style={{ 
                 width: '16px', 
                 height: '16px', 
-                filter: 'invert(1)' 
+                filter: 'brightness(0) saturate(100%) invert(1)',
+                mixBlendMode: 'difference'
               }} 
             />
           </button>

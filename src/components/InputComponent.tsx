@@ -108,7 +108,8 @@ const InputComponent: React.FC<InputComponentProps> = ({
             style={{ 
               width: '20px', 
               height: '20px', 
-              filter: inputValue.trim() ? 'invert(1) brightness(0) invert(1)' : 'invert(1)' 
+              filter: 'brightness(0) saturate(100%) invert(1)',
+              mixBlendMode: 'difference'
             }} 
           />
         </button>
@@ -218,7 +219,8 @@ const InputComponent: React.FC<InputComponentProps> = ({
             style={{ 
               width: '16px', 
               height: '16px', 
-              filter: inputValue.trim() ? 'invert(1) brightness(0) invert(1)' : 'invert(1)' 
+              filter: 'brightness(0) saturate(100%) invert(1)',
+              mixBlendMode: 'difference'
             }} 
           />
         </button>

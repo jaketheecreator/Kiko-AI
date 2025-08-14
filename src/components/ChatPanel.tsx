@@ -155,12 +155,84 @@ const ChatPanel: React.FC<Props> = ({ onBack }) => {
            justifyContent: 'flex-start',
            marginBottom: '24px'
          }}>
-           <img src={Copy} alt="Copy" style={{ width: '20px', height: '22px', cursor: 'pointer', opacity: '0.7' }} />
-           <img src={Thumbsup} alt="Thumbs Up" style={{ width: '20px', height: '22px', cursor: 'pointer', opacity: '0.7' }} />
-           <img src={Thumbsdown} alt="Thumbs Down" style={{ width: '20px', height: '22px', cursor: 'pointer', opacity: '0.7' }} />
-           <img src={Share} alt="Share" style={{ width: '20px', height: '22px', cursor: 'pointer', opacity: '0.7' }} />
-           <img src={Reload} alt="Reload" style={{ width: '20px', height: '22px', cursor: 'pointer', opacity: '0.7' }} />
-           <img src={Option} alt="Options" style={{ width: '20px', height: '22px', cursor: 'pointer', opacity: '0.7' }} />
+                       <img 
+              src={Copy} 
+              alt="Copy" 
+              style={{ 
+                width: '20px', 
+                height: '22px', 
+                cursor: 'pointer', 
+                opacity: '0.7',
+                transition: 'opacity 0.2s ease'
+              }} 
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+            />
+            <img 
+              src={Thumbsup} 
+              alt="Thumbs Up" 
+              style={{ 
+                width: '20px', 
+                height: '22px', 
+                cursor: 'pointer', 
+                opacity: '0.7',
+                transition: 'opacity 0.2s ease'
+              }} 
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+            />
+            <img 
+              src={Thumbsdown} 
+              alt="Thumbs Down" 
+              style={{ 
+                width: '20px', 
+                height: '22px', 
+                cursor: 'pointer', 
+                opacity: '0.7',
+                transition: 'opacity 0.2s ease'
+              }} 
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+            />
+            <img 
+              src={Share} 
+              alt="Share" 
+              style={{ 
+                width: '20px', 
+                height: '22px', 
+                cursor: 'pointer', 
+                opacity: '0.7',
+                transition: 'opacity 0.2s ease'
+              }} 
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+            />
+            <img 
+              src={Reload} 
+              alt="Reload" 
+              style={{ 
+                width: '20px', 
+                height: '22px', 
+                cursor: 'pointer', 
+                opacity: '0.7',
+                transition: 'opacity 0.2s ease'
+              }} 
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+            />
+            <img 
+              src={Option} 
+              alt="Options" 
+              style={{ 
+                width: '20px', 
+                height: '22px', 
+                cursor: 'pointer', 
+                opacity: '0.7',
+                transition: 'opacity 0.2s ease'
+              }} 
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+            />
          </div>
 
          {/* Chat Messages */}

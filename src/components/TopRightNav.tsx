@@ -38,7 +38,7 @@ const TopRightNav: React.FC<TopRightNavProps> = ({
         fontSize: '16px',
         fontWeight: '500',
         color: '#374151',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)'
       }}>
         <img src={Points} alt="Points" style={{ width: '20px', height: '20px' }} />
         {credits}
@@ -56,7 +56,7 @@ const TopRightNav: React.FC<TopRightNavProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)'
         }}
         onClick={onLightModeToggle}
       >
@@ -75,7 +75,7 @@ const TopRightNav: React.FC<TopRightNavProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)'
         }}
         onClick={onSettingsClick}
       >

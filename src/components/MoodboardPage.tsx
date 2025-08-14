@@ -1,10 +1,10 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Grid from '../assets/images/Grid.png';
-import Points from '../assets/icons/Points.png';
-import LightMode from '../assets/icons/Light mode.png';
-import Ellipse2 from '../assets/images/Ellipse 2.png';
 import Plus from '../assets/icons/plus.png';
+import ArrowLeft from '../assets/icons/ArrowLeft.png';
+import TopRightNav from './TopRightNav';
+import ChatPanel from './ChatPanel';
 
 function MoodboardPage() {
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
@@ -78,6 +78,18 @@ function MoodboardPage() {
       overflow: 'hidden',
       position: 'relative'
     }}>
+      {/* Chat Panel - Left Side */}
+      <div style={{
+        position: 'fixed',
+        top: '80px',
+        left: '24px',
+        width: '320px',
+        height: 'calc(100vh - 104px)',
+        zIndex: 1000
+      }}>
+        <ChatPanel onBack={handleBackToHome} />
+      </div>
+
       {/* Fixed Top Navigation */}
       {/* Back Button - Top Left */}
       <div style={{
@@ -100,97 +112,24 @@ function MoodboardPage() {
             fontSize: '16px',
             fontWeight: '500',
             color: '#374151',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+            fontFamily: 'Red Hat Display',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)'
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
+          <img src={ArrowLeft} alt="Arrow Left" style={{ width: '16px', height: '16px' }} />
           Back to home
         </button>
       </div>
 
+
+
       {/* Top Right Navigation */}
-      <div style={{
-        position: 'fixed',
-        top: '24px',
-        right: '24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '16px',
-        zIndex: 1000
-      }}>
-        {/* Project Title */}
-        <div style={{
-          padding: '12px 20px',
-          backgroundColor: '#fff',
-          borderRadius: '50px',
-          fontSize: '16px',
-          fontWeight: '600',
-          color: '#374151',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-        }}>
-          Cozy 90s cafe moodboard
-          <button style={{
-            marginLeft: '12px',
-            width: '24px',
-            height: '24px',
-            borderRadius: '50%',
-            backgroundColor: '#000',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer'
-          }}>
-            <img src={Plus} alt="Add" style={{ width: '12px', height: '12px', filter: 'invert(1)' }} />
-          </button>
-        </div>
-
-        {/* Credits */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '12px 16px',
-          backgroundColor: '#fff',
-          borderRadius: '50px',
-          fontSize: '16px',
-          fontWeight: '500',
-          color: '#374151',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-        }}>
-          <img src={Points} alt="Points" style={{ width: '16px', height: '16px' }} />
-          500/1000 Credits
-        </div>
-
-        {/* Light Mode Toggle */}
-        <button style={{
-          width: '48px',
-          height: '48px',
-          borderRadius: '50%',
-          backgroundColor: '#fff',
-          border: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-        }}>
-          <img src={LightMode} alt="Light Mode" style={{ width: '20px', height: '20px' }} />
-        </button>
-
-        {/* User Profile */}
-        <div style={{
-          width: '48px',
-          height: '48px',
-          borderRadius: '50%',
-          overflow: 'hidden',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-        }}>
-          <img src={Ellipse2} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </div>
-      </div>
+      <TopRightNav 
+        credits="500/1000 Credits"
+        onLightModeToggle={() => console.log('Light mode toggled')}
+        onSettingsClick={() => console.log('Settings clicked')}
+        onProfileClick={() => console.log('Profile clicked')}
+      />
 
       {/* Infinite Canvas */}
       <div 
@@ -262,7 +201,7 @@ function MoodboardPage() {
             cursor: 'pointer',
             fontSize: '18px',
             fontWeight: 'bold',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
             color: '#374151'
           }}
         >
@@ -282,7 +221,7 @@ function MoodboardPage() {
             cursor: 'pointer',
             fontSize: '18px',
             fontWeight: 'bold',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
             color: '#374151'
           }}
         >
@@ -302,7 +241,7 @@ function MoodboardPage() {
             cursor: 'pointer',
             fontSize: '12px',
             fontWeight: 'bold',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
             color: '#374151'
           }}
         >
@@ -316,7 +255,7 @@ function MoodboardPage() {
           fontSize: '12px',
           color: '#6b7280',
           textAlign: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
           minWidth: '44px'
         }}>
           {Math.round(zoom * 100)}%

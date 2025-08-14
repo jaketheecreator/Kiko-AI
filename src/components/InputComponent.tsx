@@ -10,6 +10,7 @@ interface InputComponentProps {
   isRecording: boolean;
   setIsRecording: (recording: boolean) => void;
   variant?: 'homepage' | 'chat';
+  onKeyPress?: (e: React.KeyboardEvent) => void;
 }
 
 const InputComponent: React.FC<InputComponentProps> = ({
@@ -17,7 +18,8 @@ const InputComponent: React.FC<InputComponentProps> = ({
   setInputValue,
   isRecording,
   setIsRecording,
-  variant = 'homepage'
+  variant = 'homepage',
+  onKeyPress
 }) => {
   if (variant === 'homepage') {
     // Original homepage input - exact copy
@@ -69,9 +71,10 @@ const InputComponent: React.FC<InputComponentProps> = ({
             background: 'none',
             outline: 'none',
             fontSize: '16px',
-            fontStyle: 'italic',
-            color: '#333',
-            minHeight: '24px'
+            fontStyle: inputValue.trim() ? 'normal' : 'italic',
+            color: inputValue.trim() ? '#000' : '#333',
+            minHeight: '24px',
+            fontFamily: 'Red Hat Display'
           }}
         />
         
@@ -88,15 +91,24 @@ const InputComponent: React.FC<InputComponentProps> = ({
             cursor: 'pointer',
             animation: isRecording ? 'recordingPulse 1.5s ease-in-out infinite' : 'none'
           }}
-          onClick={() => setIsRecording(!isRecording)}
+          onClick={() => {
+            if (inputValue.trim()) {
+              // If there's text, send the message (parent will handle this via onKeyPress)
+              // For now, just clear the input to show the button change
+              setInputValue('');
+            } else {
+              // Toggle recording
+              setIsRecording(!isRecording);
+            }
+          }}
         >
           <img 
-            src={isRecording ? mic : Send} 
-            alt={isRecording ? "Recording" : "Send"} 
+            src={inputValue.trim() ? Send : (isRecording ? mic : mic)} 
+            alt={inputValue.trim() ? "Send" : (isRecording ? "Recording" : "Mic")} 
             style={{ 
               width: '20px', 
               height: '20px', 
-              filter: isRecording ? 'invert(1)' : 'invert(1)' 
+              filter: inputValue.trim() ? 'invert(1) brightness(0) invert(1)' : 'invert(1)' 
             }} 
           />
         </button>
@@ -121,15 +133,17 @@ const InputComponent: React.FC<InputComponentProps> = ({
         placeholder="Ask Anything"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+        onKeyPress={onKeyPress}
         style={{
           border: 'none',
           background: 'transparent',
           outline: 'none',
           fontSize: '15px',
-          fontStyle: 'italic',
-          color: '#9ca3af',
+          fontStyle: inputValue.trim() ? 'normal' : 'italic',
+          color: inputValue.trim() ? '#000' : '#9ca3af',
           padding: '0',
-          marginBottom: '8px'
+          marginBottom: '8px',
+          fontFamily: 'Red Hat Display'
         }}
       />
       
@@ -187,9 +201,11 @@ const InputComponent: React.FC<InputComponentProps> = ({
           }}
           onClick={() => {
             if (inputValue.trim()) {
-              // Send logic here
-              console.log('Sending message:', inputValue);
-              setInputValue(''); // Clear input after sending
+              // If there's text, trigger the onKeyPress to send message
+              if (onKeyPress) {
+                const fakeEvent = { key: 'Enter', preventDefault: () => {} } as React.KeyboardEvent;
+                onKeyPress(fakeEvent);
+              }
             } else {
               // Toggle recording
               setIsRecording(!isRecording);
@@ -202,7 +218,7 @@ const InputComponent: React.FC<InputComponentProps> = ({
             style={{ 
               width: '16px', 
               height: '16px', 
-              filter: 'invert(1)' 
+              filter: inputValue.trim() ? 'invert(1) brightness(0) invert(1)' : 'invert(1)' 
             }} 
           />
         </button>

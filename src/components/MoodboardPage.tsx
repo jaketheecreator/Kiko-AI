@@ -131,6 +131,187 @@ function MoodboardPage() {
         onProfileClick={() => console.log('Profile clicked')}
       />
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               {/* Board Sidebar - Right Side */}
+             <div style={{
+               position: 'fixed',
+               top: '80px',
+               bottom: '24px',
+               right: '24px',
+               width: '272px',
+               backgroundColor: '#fff',
+               borderRadius: '20px',
+               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+               zIndex: 1000,
+               padding: '24px',
+               display: 'flex',
+               flexDirection: 'column'
+             }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '24px'
+        }}>
+          <h2 style={{
+            fontSize: '24px',
+            fontWeight: '600',
+            color: '#111',
+            margin: 0,
+            fontFamily: 'Red Hat Display'
+          }}>
+            My Board
+          </h2>
+                     <div style={{
+             display: 'flex',
+             gap: '8px'
+           }}>
+             <button style={{
+               width: '32px',
+               height: '32px',
+               borderRadius: '50%',
+               backgroundColor: '#f3f4f6',
+               border: 'none',
+               display: 'flex',
+               alignItems: 'center',
+               justifyContent: 'center',
+               cursor: 'pointer'
+             }}>
+               <img src={require('../assets/icons/Option.png')} alt="Options" style={{ width: '16px', height: '16px' }} />
+             </button>
+             <button style={{
+               display: 'flex',
+               alignItems: 'center',
+               gap: '6px',
+               padding: '8px 12px',
+               borderRadius: '20px',
+               backgroundColor: '#f3f4f6',
+               border: 'none',
+               cursor: 'pointer',
+               fontSize: '14px',
+               fontWeight: '500',
+               color: '#374151',
+               fontFamily: 'Red Hat Display'
+             }}>
+               <img src={require('../assets/icons/Share.png')} alt="Share" style={{ width: '16px', height: '16px' }} />
+               Share
+             </button>
+           </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '24px'
+        }}>
+          <button style={{
+            padding: '8px 16px',
+            borderRadius: '20px',
+            backgroundColor: '#000',
+            color: '#fff',
+            border: 'none',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            fontFamily: 'Red Hat Display'
+          }}>
+            Images
+          </button>
+                                           <button style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              backgroundColor: 'transparent',
+              color: '#6b7280',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              fontFamily: 'Red Hat Display'
+            }}>
+              Color
+            </button>
+            <button style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              backgroundColor: 'transparent',
+              color: '#6b7280',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              fontFamily: 'Red Hat Display'
+            }}>
+              Font
+            </button>
+        </div>
+
+                 {/* Board Content - Empty State */}
+         <div style={{
+           flex: 1,
+           display: 'grid',
+           gridTemplateColumns: '1fr 1fr',
+           gridTemplateRows: 'repeat(6, 1fr)',
+           gap: '12px',
+           gridTemplateAreas: `
+             "tall top1"
+             "tall top2"
+             "grid1 top2"
+             "grid2 top2"
+             "grid3 wide"
+             "grid4 wide"
+           `
+         }}>
+           {/* Tall left rectangle */}
+           <div style={{
+             gridArea: 'tall',
+             backgroundColor: '#f3f4f6',
+             borderRadius: '12px'
+           }} />
+           
+           {/* Top right rectangles */}
+           <div style={{
+             gridArea: 'top1',
+             backgroundColor: '#f3f4f6',
+             borderRadius: '12px'
+           }} />
+           <div style={{
+             gridArea: 'top2',
+             backgroundColor: '#f3f4f6',
+             borderRadius: '12px'
+           }} />
+           
+           {/* 2x2 grid */}
+           <div style={{
+             gridArea: 'grid1',
+             backgroundColor: '#f3f4f6',
+             borderRadius: '12px'
+           }} />
+           <div style={{
+             gridArea: 'grid2',
+             backgroundColor: '#f3f4f6',
+             borderRadius: '12px'
+           }} />
+           <div style={{
+             gridArea: 'grid3',
+             backgroundColor: '#f3f4f6',
+             borderRadius: '12px'
+           }} />
+           <div style={{
+             gridArea: 'grid4',
+             backgroundColor: '#f3f4f6',
+             borderRadius: '12px'
+           }} />
+           
+           {/* Wide bottom rectangle */}
+           <div style={{
+             gridArea: 'wide',
+             backgroundColor: '#f3f4f6',
+             borderRadius: '12px'
+           }} />
+         </div>
+      </div>
+
       {/* Infinite Canvas */}
       <div 
         ref={canvasRef}

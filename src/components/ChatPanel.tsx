@@ -51,6 +51,7 @@ const ChatPanel: React.FC<Props> = ({ onBack }) => {
       borderRadius: '20px',
       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
       height: '100%',
+      width: '100%',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden'

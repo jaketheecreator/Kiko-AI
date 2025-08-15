@@ -11,6 +11,7 @@ function MoodboardPage() {
   const [zoom, setZoom] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [activeNavItem, setActiveNavItem] = useState('home');
   const canvasRef = useRef(null);
   const navigate = useNavigate();
 
@@ -81,10 +82,10 @@ function MoodboardPage() {
       {/* Chat Panel - Left Side */}
       <div style={{
         position: 'fixed',
-        top: '80px',
+        top: '96px',
         left: '24px',
         width: '320px',
-        height: 'calc(100vh - 104px)',
+        height: 'calc(100vh - 120px)',
         zIndex: 1000
       }}>
         <ChatPanel onBack={handleBackToHome} />
@@ -131,21 +132,21 @@ function MoodboardPage() {
         onProfileClick={() => console.log('Profile clicked')}
       />
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               {/* Board Sidebar - Right Side */}
-             <div style={{
-               position: 'fixed',
-               top: '80px',
-               bottom: '24px',
-               right: '24px',
-               width: '272px',
-               backgroundColor: '#fff',
-               borderRadius: '20px',
-               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-               zIndex: 1000,
-               padding: '24px',
-               display: 'flex',
-               flexDirection: 'column'
-             }}>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             {/* Board Sidebar - Right Side */}
+           <div style={{
+             position: 'fixed',
+             top: '96px',
+             bottom: '24px',
+             right: '24px',
+             width: '272px',
+             backgroundColor: '#fff',
+             borderRadius: '20px',
+             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+             zIndex: 1000,
+             padding: '24px',
+             display: 'flex',
+             flexDirection: 'column'
+           }}>
         {/* Header */}
         <div style={{
           display: 'flex',
@@ -358,90 +359,238 @@ function MoodboardPage() {
         </div>
       </div>
 
-      {/* Zoom Controls - Simple and Bulletproof */}
-      <div style={{
-        position: 'fixed',
-        bottom: '24px',
-        right: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px',
-        zIndex: 9999
-      }}>
-        <button
-          onClick={handleZoomIn}
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '8px',
-            backgroundColor: '#fff',
-            border: '1px solid #e5e7eb',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-            color: '#374151'
-          }}
-        >
-          +
-        </button>
-        <button
-          onClick={handleZoomOut}
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '8px',
-            backgroundColor: '#fff',
-            border: '1px solid #e5e7eb',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-            color: '#374151'
-          }}
-        >
-          −
-        </button>
-        <button
-          onClick={handleResetZoom}
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '8px',
-            backgroundColor: '#fff',
-            border: '1px solid #e5e7eb',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-            color: '#374151'
-          }}
-        >
-          1:1
-        </button>
-        <div style={{
-          backgroundColor: '#fff',
-          border: '1px solid #e5e7eb',
-          borderRadius: '8px',
-          padding: '8px',
-          fontSize: '12px',
-          color: '#6b7280',
-          textAlign: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-          minWidth: '44px'
-        }}>
-          {Math.round(zoom * 100)}%
+                                                         {/* Bottom Navigation Bar */}
+         <div style={{
+           position: 'fixed',
+           bottom: '24px',
+           left: '50%',
+           transform: 'translateX(-50%)',
+           display: 'flex',
+           alignItems: 'center',
+           gap: '8px',
+           padding: '12px 12px',
+           backgroundColor: '#fff',
+           borderRadius: '50px',
+           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
+           zIndex: 9999
+         }}>
+          {/* Home */}
+          <div 
+            onClick={() => setActiveNavItem('home')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: activeNavItem === 'home' ? '6px' : '0px',
+              padding: activeNavItem === 'home' ? '12px 16px' : '12px',
+              backgroundColor: activeNavItem === 'home' ? '#f3f4f6' : 'transparent',
+              borderRadius: '50px',
+              border: activeNavItem === 'home' ? 'none' : '1px solid #e5e7eb',
+              cursor: 'pointer',
+              height: '44px',
+              boxSizing: 'border-box',
+              transition: 'all 0.3s ease',
+              width: activeNavItem === 'home' ? 'auto' : '44px',
+              justifyContent: activeNavItem === 'home' ? 'flex-start' : 'center'
+            }}
+          >
+            <img src={require('../assets/icons/Home.png')} alt="Home" style={{ width: '20px', height: '20px' }} />
+            {activeNavItem === 'home' && (
+              <span style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#000',
+                fontFamily: 'Red Hat Display',
+                whiteSpace: 'nowrap'
+              }}>
+                Home
+              </span>
+            )}
+          </div>
+
+          {/* Gallery */}
+          <div 
+            onClick={() => setActiveNavItem('gallery')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: activeNavItem === 'gallery' ? '6px' : '0px',
+              padding: activeNavItem === 'gallery' ? '12px 16px' : '12px',
+              backgroundColor: activeNavItem === 'gallery' ? '#f3f4f6' : 'transparent',
+              borderRadius: '50px',
+              border: activeNavItem === 'gallery' ? 'none' : '1px solid #e5e7eb',
+              cursor: 'pointer',
+              height: '44px',
+              boxSizing: 'border-box',
+              transition: 'all 0.3s ease',
+              width: activeNavItem === 'gallery' ? 'auto' : '44px',
+              justifyContent: activeNavItem === 'gallery' ? 'flex-start' : 'center'
+            }}
+          >
+            <img src={require('../assets/icons/Gallery.png')} alt="Gallery" style={{ width: '20px', height: '20px' }} />
+            {activeNavItem === 'gallery' && (
+              <span style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#000',
+                fontFamily: 'Red Hat Display',
+                whiteSpace: 'nowrap'
+              }}>
+                Gallery
+              </span>
+            )}
+          </div>
+
+          {/* Boards */}
+          <div 
+            onClick={() => setActiveNavItem('boards')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: activeNavItem === 'boards' ? '6px' : '0px',
+              padding: activeNavItem === 'boards' ? '12px 16px' : '12px',
+              backgroundColor: activeNavItem === 'boards' ? '#f3f4f6' : 'transparent',
+              borderRadius: '50px',
+              border: activeNavItem === 'boards' ? 'none' : '1px solid #e5e7eb',
+              cursor: 'pointer',
+              height: '44px',
+              boxSizing: 'border-box',
+              transition: 'all 0.3s ease',
+              width: activeNavItem === 'boards' ? 'auto' : '44px',
+              justifyContent: activeNavItem === 'boards' ? 'flex-start' : 'center'
+            }}
+          >
+            <img src={require('../assets/icons/Boards.png')} alt="Boards" style={{ width: '20px', height: '20px' }} />
+            {activeNavItem === 'boards' && (
+              <span style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#000',
+                fontFamily: 'Red Hat Display',
+                whiteSpace: 'nowrap'
+              }}>
+                Boards
+              </span>
+            )}
+          </div>
+
+          {/* Inspirations */}
+          <div 
+            onClick={() => setActiveNavItem('inspirations')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: activeNavItem === 'inspirations' ? '6px' : '0px',
+              padding: activeNavItem === 'inspirations' ? '12px 16px' : '12px',
+              backgroundColor: activeNavItem === 'inspirations' ? '#f3f4f6' : 'transparent',
+              borderRadius: '50px',
+              border: activeNavItem === 'inspirations' ? 'none' : '1px solid #e5e7eb',
+              cursor: 'pointer',
+              height: '44px',
+              boxSizing: 'border-box',
+              transition: 'all 0.3s ease',
+              width: activeNavItem === 'inspirations' ? 'auto' : '44px',
+              justifyContent: activeNavItem === 'inspirations' ? 'flex-start' : 'center'
+            }}
+          >
+            <img src={require('../assets/icons/Inspirations.png')} alt="Inspirations" style={{ width: '20px', height: '20px' }} />
+            {activeNavItem === 'inspirations' && (
+              <span style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#000',
+                fontFamily: 'Red Hat Display',
+                whiteSpace: 'nowrap'
+              }}>
+                Inspirations
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+
+       {/* Zoom Controls - Simple and Bulletproof */}
+       <div style={{
+         position: 'fixed',
+         bottom: '24px',
+         right: '24px',
+         display: 'flex',
+         flexDirection: 'column',
+         gap: '8px',
+         zIndex: 9999
+       }}>
+         <button
+           onClick={handleZoomIn}
+           style={{
+             width: '44px',
+             height: '44px',
+             borderRadius: '8px',
+             backgroundColor: '#fff',
+             border: '1px solid #e5e7eb',
+             display: 'flex',
+             alignItems: 'center',
+             justifyContent: 'center',
+             cursor: 'pointer',
+             fontSize: '18px',
+             fontWeight: 'bold',
+             boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+             color: '#374151'
+           }}
+         >
+           +
+         </button>
+         <button
+           onClick={handleZoomOut}
+           style={{
+             width: '44px',
+             height: '44px',
+             borderRadius: '8px',
+             backgroundColor: '#fff',
+             border: '1px solid #e5e7eb',
+             display: 'flex',
+             alignItems: 'center',
+             justifyContent: 'center',
+             cursor: 'pointer',
+             fontSize: '18px',
+             fontWeight: 'bold',
+             boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+             color: '#374151'
+           }}
+         >
+           −
+         </button>
+         <button
+           onClick={handleResetZoom}
+           style={{
+             width: '44px',
+             height: '44px',
+             borderRadius: '8px',
+             backgroundColor: '#fff',
+             border: '1px solid #e5e7eb',
+             display: 'flex',
+             alignItems: 'center',
+             justifyContent: 'center',
+             cursor: 'pointer',
+             fontSize: '12px',
+             fontWeight: 'bold',
+             boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+             color: '#374151'
+           }}
+         >
+           1:1
+         </button>
+         <div style={{
+           backgroundColor: '#fff',
+           border: '1px solid #e5e7eb',
+           borderRadius: '8px',
+           padding: '8px',
+           fontSize: '12px',
+           color: '#6b7280',
+           textAlign: 'center',
+           boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+           minWidth: '44px'
+         }}>
+           {Math.round(zoom * 100)}%
+         </div>
+       </div>
 
       <style>
         {`

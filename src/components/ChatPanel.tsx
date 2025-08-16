@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InputComponent from './InputComponent';
 import Copy from '../assets/icons/Copy.png';
 import Thumbsup from '../assets/icons/Thumbsup.png';
@@ -6,35 +6,53 @@ import Thumbsdown from '../assets/icons/Thumbsdown.png';
 import Share from '../assets/icons/Share.png';
 import Reload from '../assets/icons/Reload.png';
 import Option from '../assets/icons/Option.png';
+import { ChatData, ChatMessage, saveChatData, generateAssistantReply } from '../utils/chatStorage';
 
 type Props = {
   onBack?: () => void;
+  chatData: ChatData | null;
 };
 
-const ChatPanel: React.FC<Props> = ({ onBack }) => {
+const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [messages, setMessages] = useState<Array<{id: string, text: string, isUser: boolean}>>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  // Load messages from chatData when it changes
+  useEffect(() => {
+    if (chatData?.messages) {
+      // Filter out the first message (which is the original idea already shown in header)
+      const messagesToShow = chatData.messages.slice(1);
+      setMessages(messagesToShow);
+    }
+  }, [chatData]);
 
   const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      const newMessage = {
-        id: Date.now().toString(),
+    if (inputValue.trim() && chatData) {
+      // Create user message
+      const userMessage: ChatMessage = {
+        id: `msg-${Date.now()}`,
         text: inputValue.trim(),
-        isUser: true
+        sender: 'user',
+        timestamp: Date.now()
       };
-      setMessages(prev => [...prev, newMessage]);
+
+      // Create assistant reply
+      const assistantMessage = generateAssistantReply(inputValue.trim());
+
+      // Update messages state (add to filtered messages for display)
+      const newMessages = [...messages, userMessage, assistantMessage];
+      setMessages(newMessages);
+
+      // Update chatData and save to localStorage (add to full chatData.messages)
+      const updatedChatData: ChatData = {
+        ...chatData,
+        messages: [...chatData.messages, userMessage, assistantMessage]
+      };
+      saveChatData(updatedChatData);
+
+      // Clear input
       setInputValue('');
-      
-      // Simulate AI response (you can replace this with actual API call)
-      setTimeout(() => {
-        const aiResponse = {
-          id: (Date.now() + 1).toString(),
-          text: "I'll help you create that cozy 90s cafe moodboard! What specific elements would you like me to focus on?",
-          isUser: false
-        };
-        setMessages(prev => [...prev, aiResponse]);
-      }, 1000);
     }
   };
 
@@ -59,7 +77,7 @@ const ChatPanel: React.FC<Props> = ({ onBack }) => {
       {/* Header with Title Pill */}
       <div style={{
         padding: '24px 24px 16px 24px',
-        textAlign: 'center'
+        textAlign: 'right'
       }}>
         <div style={{
           backgroundColor: '#f8f9fa',
@@ -74,7 +92,7 @@ const ChatPanel: React.FC<Props> = ({ onBack }) => {
              color: '#374151',
              fontFamily: 'Red Hat Display'
            }}>
-             Generate a cozy 90s cafe moodboard
+             {chatData?.idea || 'Loading...'}
            </span>
         </div>
       </div>
@@ -245,16 +263,17 @@ const ChatPanel: React.FC<Props> = ({ onBack }) => {
                key={message.id}
                style={{
                  marginBottom: '16px',
-                 textAlign: message.isUser ? 'right' : 'left'
+                 display: 'flex',
+                 justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start',
+                 width: '100%'
                }}
              >
                <div style={{
-                 display: 'inline-block',
                  maxWidth: '80%',
-                 padding: '12px 16px',
-                 borderRadius: '18px',
-                 backgroundColor: message.isUser ? '#000' : '#f3f4f6',
-                 color: message.isUser ? '#fff' : '#374151',
+                 padding: message.sender === 'user' ? '12px 16px' : '0',
+                 borderRadius: message.sender === 'user' ? '18px' : '0',
+                 backgroundColor: message.sender === 'user' ? '#f8f9fa' : 'transparent',
+                 color: message.sender === 'user' ? '#000' : '#374151',
                  fontSize: '14px',
                  lineHeight: '1.4',
                  fontFamily: 'Red Hat Display'

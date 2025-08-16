@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChatData, ChatMessage } from '../utils/chatStorage';
+import PageTransition from './PageTransition';
 import Grid from '../assets/images/Grid.png';
 import Logo from '../assets/icons/Logo.png';
 import Home from '../assets/icons/Home.png';
@@ -27,16 +29,34 @@ function Homepage() {
 
   const handleInputSubmit = () => {
     if (inputValue.trim()) {
+      // Create initial chat data with user's idea
+      const chatData: ChatData = {
+        idea: inputValue.trim(),
+        messages: [
+          {
+            id: `msg-${Date.now()}`,
+            text: inputValue.trim(),
+            sender: 'user',
+            timestamp: Date.now()
+          }
+        ]
+      };
+      
+      // Store in localStorage
+      localStorage.setItem('kiko_chat', JSON.stringify(chatData));
+      
+      // Navigate to moodboard
       navigate('/moodboard');
     }
   };
 
   return (
-    <div style={{ 
-      height: '100vh', 
-      width: '100vw',
-      overflow: 'hidden',
-      position: 'relative',
+    <PageTransition>
+      <div style={{ 
+        height: '100vh', 
+        width: '100vw',
+        overflow: 'hidden',
+        position: 'relative',
       backgroundColor: '#f1f1f1',
       backgroundImage: `
         linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
@@ -654,6 +674,7 @@ function Homepage() {
         `}
       </style>
     </div>
+    </PageTransition>
   );
 }
 

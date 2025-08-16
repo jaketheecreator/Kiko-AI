@@ -1,5 +1,8 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChatData, ChatMessage, loadChatData } from '../utils/chatStorage';
+import PageTransition from './PageTransition';
+import Shimmer from './Shimmer';
 import Grid from '../assets/images/Grid.png';
 import Plus from '../assets/icons/plus.png';
 import ArrowLeft from '../assets/icons/ArrowLeft.png';
@@ -14,7 +17,15 @@ function MoodboardPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [activeNavItem, setActiveNavItem] = useState('home');
-  const [boardPosition, setBoardPosition] = useState({ x: 400, y: 200 });
+  // Center the board in viewport (accounting for sidebars)
+  // Viewport width minus chat panel (344px) and board sidebar (296px) = available width
+  // Board component is 494px wide
+  const centerX = (window.innerWidth - 344 - 296 - 494) / 2 + 344; // Add chat panel width offset
+  const centerY = (window.innerHeight - 400) / 2; // Board height is roughly 400px
+  const [boardPosition, setBoardPosition] = useState({ 
+    x: Math.max(centerX, 370), // Ensure minimum distance from left
+    y: Math.max(centerY, 150)  // Ensure minimum distance from top
+  });
   const [isDraggingBoard, setIsDraggingBoard] = useState(false);
   const [boardDragStart, setBoardDragStart] = useState({ x: 0, y: 0 });
   const [activeTab, setActiveTab] = useState('Images');
@@ -42,8 +53,37 @@ function MoodboardPage() {
 
   const [centerImages, setCenterImages] = useState<ImageData[]>(initialCenterImages);
   const [rightBoardImages, setRightBoardImages] = useState<ImageData[]>([]);
+  const [chatData, setChatData] = useState<ChatData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
+
+  // Initialize immediately to show shimmer
+  useEffect(() => {
+    setHasInitialized(true);
+  }, []);
+
+  // Load chat data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      // Check for chat data first
+      const loadedChatData = loadChatData();
+      if (!loadedChatData) {
+        // If no chat data, redirect to homepage immediately
+        navigate('/');
+        return;
+      }
+      
+      // Add artificial delay for shimmer effect (only if we have data)
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      setChatData(loadedChatData);
+      setIsLoading(false);
+    };
+    
+    loadData();
+  }, [navigate]);
 
   // Transfer functions
   const moveToBoard = useCallback((imageId: number) => {
@@ -116,6 +156,8 @@ function MoodboardPage() {
   }, []);
 
   const handleBackToHome = () => {
+    // Optional: Clear chat data when going back to home
+    // localStorage.removeItem('kiko_chat');
     navigate('/');
   };
 
@@ -141,13 +183,19 @@ function MoodboardPage() {
     setIsDraggingBoard(false);
   }, []);
 
+  // Don't render anything until initialized
+  if (!hasInitialized) {
+    return null;
+  }
+
   return (
-    <div style={{ 
-      height: '100vh', 
-      width: '100vw',
-      overflow: 'hidden',
-      position: 'relative'
-    }}>
+    <PageTransition trigger={hasInitialized}>
+      <div style={{ 
+        height: '100vh', 
+        width: '100vw',
+        overflow: 'hidden',
+        position: 'relative'
+      }}>
       {/* Chat Panel - Left Side */}
       <div style={{
         position: 'fixed',
@@ -157,7 +205,28 @@ function MoodboardPage() {
         height: 'calc(100vh - 120px)',
         zIndex: 1000
       }}>
-        <ChatPanel onBack={handleBackToHome} />
+        {isLoading ? (
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '20px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+            height: '100%',
+            width: '100%',
+            padding: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
+            <Shimmer height="40px" borderRadius="20px" />
+            <Shimmer height="80px" borderRadius="12px" delay={200} />
+            <Shimmer height="60px" borderRadius="12px" delay={400} />
+            <Shimmer height="40px" width="70%" borderRadius="12px" delay={600} />
+            <div style={{ flex: 1 }} />
+            <Shimmer height="50px" borderRadius="25px" delay={800} />
+          </div>
+        ) : (
+          <ChatPanel onBack={handleBackToHome} chatData={chatData} />
+        )}
       </div>
 
       {/* Fixed Top Navigation */}
@@ -168,38 +237,58 @@ function MoodboardPage() {
         left: '24px',
         zIndex: 1000
       }}>
-        <button 
-          onClick={handleBackToHome}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 16px',
-            backgroundColor: '#fff',
-            borderRadius: '50px',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: '500',
-            color: '#374151',
-            fontFamily: 'Red Hat Display',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)'
-          }}
-        >
-          <img src={ArrowLeft} alt="Arrow Left" style={{ width: '16px', height: '16px' }} />
-          Back to home
-        </button>
+        {isLoading ? (
+          <Shimmer height="44px" width="140px" borderRadius="50px" />
+        ) : (
+          <button 
+            onClick={handleBackToHome}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 16px',
+              backgroundColor: '#fff',
+              borderRadius: '50px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '500',
+              color: '#374151',
+              fontFamily: 'Red Hat Display',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)'
+            }}
+          >
+            <img src={ArrowLeft} alt="Arrow Left" style={{ width: '16px', height: '16px' }} />
+            Back to home
+          </button>
+        )}
       </div>
 
 
 
       {/* Top Right Navigation */}
-      <TopRightNav 
-        credits="500/1000 Credits"
-        onLightModeToggle={() => console.log('Light mode toggled')}
-        onSettingsClick={() => console.log('Settings clicked')}
-        onProfileClick={() => console.log('Profile clicked')}
-      />
+      {isLoading ? (
+        <div style={{
+          position: 'fixed',
+          top: '24px',
+          right: '24px',
+          zIndex: 1000,
+          display: 'flex',
+          gap: '16px'
+        }}>
+          <Shimmer height="44px" width="120px" borderRadius="22px" />
+          <Shimmer height="44px" width="44px" borderRadius="50%" delay={100} />
+          <Shimmer height="44px" width="44px" borderRadius="50%" delay={200} />
+          <Shimmer height="44px" width="44px" borderRadius="50%" delay={300} />
+        </div>
+      ) : (
+        <TopRightNav 
+          credits="500/1000 Credits"
+          onLightModeToggle={() => console.log('Light mode toggled')}
+          onSettingsClick={() => console.log('Settings clicked')}
+          onProfileClick={() => console.log('Profile clicked')}
+        />
+      )}
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              {/* Board Sidebar - Right Side */}
            <div style={{
@@ -216,6 +305,31 @@ function MoodboardPage() {
              display: 'flex',
              flexDirection: 'column'
            }}>
+           {isLoading ? (
+             <>
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                 <Shimmer height="28px" width="120px" borderRadius="8px" />
+                 <div style={{ display: 'flex', gap: '8px' }}>
+                   <Shimmer height="32px" width="32px" borderRadius="50%" delay={100} />
+                   <Shimmer height="32px" width="80px" borderRadius="20px" delay={200} />
+                 </div>
+               </div>
+               <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                 <Shimmer height="36px" width="70px" borderRadius="20px" delay={300} />
+                 <Shimmer height="36px" width="50px" borderRadius="20px" delay={400} />
+                 <Shimmer height="36px" width="50px" borderRadius="20px" delay={500} />
+               </div>
+               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(6, 1fr)', gap: '10px' }}>
+                 <Shimmer borderRadius="12px" delay={600} />
+                 <Shimmer borderRadius="12px" delay={700} />
+                 <Shimmer borderRadius="12px" delay={800} />
+                 <Shimmer borderRadius="12px" delay={900} />
+                 <Shimmer borderRadius="12px" delay={1000} />
+                 <Shimmer borderRadius="12px" delay={1100} />
+               </div>
+             </>
+           ) : (
+             <>
                  {/* Header */}
          <div style={{
            display: 'flex',
@@ -562,6 +676,8 @@ function MoodboardPage() {
              </div>
            )}
          </div>
+         </>
+           )}
       </div>
 
       {/* Infinite Canvas */}
@@ -575,7 +691,9 @@ function MoodboardPage() {
           bottom: 0,
           backgroundColor: '#f5f5f5',
           cursor: isDragging ? 'grabbing' : 'grab',
-          userSelect: 'none'
+          userSelect: 'none',
+          opacity: isLoading ? 0.3 : 1,
+          transition: 'opacity 0.3s ease'
         }}
                  onMouseDown={handleMouseDown}
          onMouseMove={(e) => {
@@ -1180,6 +1298,7 @@ function MoodboardPage() {
         `}
       </style>
     </div>
+    </PageTransition>
   );
 }
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Grid from '../assets/images/Grid.png';
 import Plus from '../assets/icons/plus.png';
 import ArrowLeft from '../assets/icons/ArrowLeft.png';
+import Heart from '../assets/icons/Heart.png';
 import TopRightNav from './TopRightNav';
 import ChatPanel from './ChatPanel';
 
@@ -12,6 +13,10 @@ function MoodboardPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [activeNavItem, setActiveNavItem] = useState('home');
+  const [boardPosition, setBoardPosition] = useState({ x: 400, y: 200 });
+  const [isDraggingBoard, setIsDraggingBoard] = useState(false);
+  const [boardDragStart, setBoardDragStart] = useState({ x: 0, y: 0 });
+  const [activeTab, setActiveTab] = useState('Images');
   const canvasRef = useRef(null);
   const navigate = useNavigate();
 
@@ -71,6 +76,28 @@ function MoodboardPage() {
   const handleBackToHome = () => {
     navigate('/');
   };
+
+  const handleBoardMouseDown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDraggingBoard(true);
+    setBoardDragStart({
+      x: e.clientX - boardPosition.x,
+      y: e.clientY - boardPosition.y
+    });
+  }, [boardPosition]);
+
+  const handleBoardMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDraggingBoard) return;
+    
+    setBoardPosition({
+      x: e.clientX - boardDragStart.x,
+      y: e.clientY - boardDragStart.y
+    });
+  }, [isDraggingBoard, boardDragStart]);
+
+  const handleBoardMouseUp = useCallback(() => {
+    setIsDraggingBoard(false);
+  }, []);
 
   return (
     <div style={{ 
@@ -147,13 +174,13 @@ function MoodboardPage() {
              display: 'flex',
              flexDirection: 'column'
            }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '24px'
-        }}>
+                 {/* Header */}
+         <div style={{
+           display: 'flex',
+           alignItems: 'center',
+           justifyContent: 'space-between',
+           marginBottom: '16px'
+         }}>
           <h2 style={{
             fontSize: '24px',
             fontWeight: '600',
@@ -200,116 +227,273 @@ function MoodboardPage() {
            </div>
         </div>
 
-        {/* Tabs */}
-        <div style={{
-          display: 'flex',
-          gap: '8px',
-          marginBottom: '24px'
-        }}>
-          <button style={{
-            padding: '8px 16px',
-            borderRadius: '20px',
-            backgroundColor: '#000',
-            color: '#fff',
-            border: 'none',
-            fontSize: '14px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            fontFamily: 'Red Hat Display'
-          }}>
+                 {/* Tabs */}
+         <div style={{
+           display: 'flex',
+           gap: '8px',
+           marginBottom: '16px'
+         }}>
+          <button 
+            onClick={() => setActiveTab('Images')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              backgroundColor: activeTab === 'Images' ? '#000' : 'transparent',
+              color: activeTab === 'Images' ? '#fff' : '#6b7280',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              fontFamily: 'Red Hat Display',
+              transition: 'all 0.3s ease'
+            }}>
             Images
           </button>
-                                           <button style={{
+          <button 
+            onClick={() => setActiveTab('Color')}
+            style={{
               padding: '8px 16px',
               borderRadius: '20px',
-              backgroundColor: 'transparent',
-              color: '#6b7280',
+              backgroundColor: activeTab === 'Color' ? '#000' : 'transparent',
+              color: activeTab === 'Color' ? '#fff' : '#6b7280',
               border: 'none',
               fontSize: '14px',
               fontWeight: '700',
               cursor: 'pointer',
-              fontFamily: 'Red Hat Display'
+              fontFamily: 'Red Hat Display',
+              transition: 'all 0.3s ease'
             }}>
-              Color
-            </button>
-            <button style={{
+            Color
+          </button>
+          <button 
+            onClick={() => setActiveTab('Font')}
+            style={{
               padding: '8px 16px',
               borderRadius: '20px',
-              backgroundColor: 'transparent',
-              color: '#6b7280',
+              backgroundColor: activeTab === 'Font' ? '#000' : 'transparent',
+              color: activeTab === 'Font' ? '#fff' : '#6b7280',
               border: 'none',
               fontSize: '14px',
               fontWeight: '700',
               cursor: 'pointer',
-              fontFamily: 'Red Hat Display'
+              fontFamily: 'Red Hat Display',
+              transition: 'all 0.3s ease'
             }}>
-              Font
-            </button>
+            Font
+          </button>
         </div>
 
-                 {/* Board Content - Empty State */}
+                 {/* Board Content - Dynamic Content */}
          <div style={{
            flex: 1,
-           display: 'grid',
-           gridTemplateColumns: '1fr 1fr',
-           gridTemplateRows: 'repeat(6, 1fr)',
-           gap: '12px',
-           gridTemplateAreas: `
-             "tall top1"
-             "tall top2"
-             "grid1 top2"
-             "grid2 top2"
-             "grid3 wide"
-             "grid4 wide"
-           `
+           opacity: 1,
+           transform: 'translateY(0)',
+           transition: 'all 0.4s ease',
+           minHeight: 0,
+           overflow: 'hidden'
          }}>
-           {/* Tall left rectangle */}
-           <div style={{
-             gridArea: 'tall',
-             backgroundColor: '#f3f4f6',
-             borderRadius: '12px'
-           }} />
-           
-           {/* Top right rectangles */}
-           <div style={{
-             gridArea: 'top1',
-             backgroundColor: '#f3f4f6',
-             borderRadius: '12px'
-           }} />
-           <div style={{
-             gridArea: 'top2',
-             backgroundColor: '#f3f4f6',
-             borderRadius: '12px'
-           }} />
-           
-           {/* 2x2 grid */}
-           <div style={{
-             gridArea: 'grid1',
-             backgroundColor: '#f3f4f6',
-             borderRadius: '12px'
-           }} />
-           <div style={{
-             gridArea: 'grid2',
-             backgroundColor: '#f3f4f6',
-             borderRadius: '12px'
-           }} />
-           <div style={{
-             gridArea: 'grid3',
-             backgroundColor: '#f3f4f6',
-             borderRadius: '12px'
-           }} />
-           <div style={{
-             gridArea: 'grid4',
-             backgroundColor: '#f3f4f6',
-             borderRadius: '12px'
-           }} />
-           
-           {/* Wide bottom rectangle */}
-           <div style={{
-             gridArea: 'wide',
-             backgroundColor: '#f3f4f6',
-             borderRadius: '12px'
-           }} />
+           {activeTab === 'Images' && (
+             <div style={{
+               display: 'grid',
+               gridTemplateColumns: '1fr 1fr',
+               gridTemplateRows: 'repeat(6, 1fr)',
+               gap: '10px',
+               height: '100%',
+               gridTemplateAreas: `
+                 "top1 wideR"
+                 "tall wideR"
+                 "tall tallR"
+                 "tall tallR"
+                 "wide tallR"
+                 "wide top1R"
+               `
+             }}>
+               {/* Left column - proper bento */}
+               <div style={{
+                 gridArea: 'top1',
+                 backgroundColor: '#f3f4f6',
+                 borderRadius: '12px'
+               }} />
+               <div style={{
+                 gridArea: 'tall',
+                 backgroundColor: '#f3f4f6',
+                 borderRadius: '12px'
+               }} />
+               <div style={{
+                 gridArea: 'wide',
+                 backgroundColor: '#f3f4f6',
+                 borderRadius: '12px'
+               }} />
+               
+               {/* Right column - same style as left */}
+               <div style={{
+                 gridArea: 'top1R',
+                 backgroundColor: '#f3f4f6',
+                 borderRadius: '12px'
+               }} />
+               <div style={{
+                 gridArea: 'tallR',
+                 backgroundColor: '#f3f4f6',
+                 borderRadius: '12px'
+               }} />
+               <div style={{
+                 gridArea: 'wideR',
+                 backgroundColor: '#f3f4f6',
+                 borderRadius: '12px'
+               }} />
+             </div>
+           )}
+
+           {activeTab === 'Color' && (
+             <div style={{
+               display: 'grid',
+               gridTemplateColumns: '1fr 1fr',
+               gap: '12px',
+               height: '100%'
+             }}>
+               {/* Color swatches */}
+               <div style={{
+                 backgroundColor: '#C65500',
+                 borderRadius: '12px',
+                 display: 'flex',
+                 flexDirection: 'column',
+                 justifyContent: 'flex-end',
+                 padding: '12px',
+                 color: '#fff',
+                 fontSize: '12px',
+                 fontFamily: 'Red Hat Display'
+               }}>
+                 <div style={{ fontWeight: '500' }}>Burnt Orange</div>
+                 <div style={{ opacity: 0.8 }}>#C65500</div>
+               </div>
+               <div style={{
+                 backgroundColor: '#4B5E2E',
+                 borderRadius: '12px',
+                 display: 'flex',
+                 flexDirection: 'column',
+                 justifyContent: 'flex-end',
+                 padding: '12px',
+                 color: '#fff',
+                 fontSize: '12px',
+                 fontFamily: 'Red Hat Display'
+               }}>
+                 <div style={{ fontWeight: '500' }}>Deep Moss</div>
+                 <div style={{ opacity: 0.8 }}>#4B5E2E</div>
+               </div>
+               <div style={{
+                 backgroundColor: '#D4AF37',
+                 borderRadius: '12px',
+                 display: 'flex',
+                 flexDirection: 'column',
+                 justifyContent: 'flex-end',
+                 padding: '12px',
+                 color: '#fff',
+                 fontSize: '12px',
+                 fontFamily: 'Red Hat Display'
+               }}>
+                 <div style={{ fontWeight: '500' }}>Faded Mustard</div>
+                 <div style={{ opacity: 0.8 }}>#D4AF37</div>
+               </div>
+               <div style={{
+                 backgroundColor: '#F5E6D0',
+                 borderRadius: '12px',
+                 display: 'flex',
+                 flexDirection: 'column',
+                 justifyContent: 'flex-end',
+                 padding: '12px',
+                 color: '#333',
+                 fontSize: '12px',
+                 fontFamily: 'Red Hat Display'
+               }}>
+                 <div style={{ fontWeight: '500' }}>Warm Beige</div>
+                 <div style={{ opacity: 0.7 }}>#F5E6D0</div>
+               </div>
+               <div style={{
+                 backgroundColor: '#2E4E3F',
+                 borderRadius: '12px',
+                 display: 'flex',
+                 flexDirection: 'column',
+                 justifyContent: 'flex-end',
+                 padding: '12px',
+                 color: '#fff',
+                 fontSize: '12px',
+                 fontFamily: 'Red Hat Display',
+                 gridColumn: 'span 2'
+               }}>
+                 <div style={{ fontWeight: '500' }}>Forest Green</div>
+                 <div style={{ opacity: 0.8 }}>#2E4E3F</div>
+               </div>
+             </div>
+           )}
+
+           {activeTab === 'Font' && (
+             <div style={{
+               display: 'flex',
+               flexDirection: 'column',
+               gap: '24px',
+               flex: 1,
+               padding: '16px',
+               backgroundColor: '#fafafa',
+               borderRadius: '12px',
+               overflow: 'auto',
+               maxHeight: '100%'
+             }}>
+               <div>
+                 <div style={{
+                   fontSize: '23px',
+                   fontWeight: '600',
+                   color: '#111',
+                   fontFamily: 'Red Hat Display',
+                   marginBottom: '4px'
+                 }}>
+                   Cooper Black
+                 </div>
+                 <div style={{
+                   fontSize: '15px',
+                   color: '#9ca3af',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   Titles / Hero
+                 </div>
+               </div>
+               <div>
+                 <div style={{
+                   fontSize: '20px',
+                   fontWeight: '600',
+                   color: '#111',
+                   fontFamily: 'Red Hat Display',
+                   marginBottom: '4px'
+                 }}>
+                   Courier Prime
+                 </div>
+                 <div style={{
+                   fontSize: '15px',
+                   color: '#9ca3af',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   Subheaders / Quotes
+                 </div>
+               </div>
+               <div>
+                 <div style={{
+                   fontSize: '19px',
+                   fontWeight: '400',
+                   color: '#111',
+                   fontFamily: 'serif',
+                   marginBottom: '4px'
+                 }}>
+                   Quattrocento Serif
+                 </div>
+                 <div style={{
+                   fontSize: '15px',
+                   color: '#9ca3af',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   Body Text / Elegant captions
+                 </div>
+               </div>
+             </div>
+           )}
          </div>
       </div>
 
@@ -326,10 +510,19 @@ function MoodboardPage() {
           cursor: isDragging ? 'grabbing' : 'grab',
           userSelect: 'none'
         }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+                 onMouseDown={handleMouseDown}
+         onMouseMove={(e) => {
+           handleMouseMove(e);
+           handleBoardMouseMove(e);
+         }}
+         onMouseUp={() => {
+           handleMouseUp();
+           handleBoardMouseUp();
+         }}
+         onMouseLeave={() => {
+           handleMouseUp();
+           handleBoardMouseUp();
+         }}
         onWheel={handleWheel}
       >
         {/* Draggable Canvas Content */}
@@ -343,19 +536,432 @@ function MoodboardPage() {
           transformOrigin: 'center center',
           transition: isDragging ? 'none' : 'transform 0.1s ease-out'
         }}>
-          {/* Grid Background */}
-          <div style={{
-            position: 'absolute',
-            top: '-2000px',
-            left: '-2000px',
-            width: '4000px',
-            height: '4000px',
-            backgroundImage: `url(${Grid}), linear-gradient(to right, #e5e7eb 1px, transparent 1px), linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)`,
-            backgroundSize: '40px 40px, 40px 40px, 40px 40px',
-            backgroundRepeat: 'repeat',
-            opacity: 0.5,
-            pointerEvents: 'none'
-          }} />
+                     {/* Grid Background */}
+           <div style={{
+             position: 'absolute',
+             top: '-2000px',
+             left: '-2000px',
+             width: '4000px',
+             height: '4000px',
+             backgroundImage: `url(${Grid}), linear-gradient(to right, #e5e7eb 1px, transparent 1px), linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)`,
+             backgroundSize: '40px 40px, 40px 40px, 40px 40px',
+             backgroundRepeat: 'repeat',
+             opacity: 0.5,
+             pointerEvents: 'none'
+           }} />
+
+           {/* Draggable Moodboard Component */}
+           <div 
+             onMouseDown={handleBoardMouseDown}
+             style={{
+               position: 'absolute',
+               left: `${boardPosition.x}px`,
+               top: `${boardPosition.y}px`,
+               width: '494px',
+               backgroundColor: '#fff',
+               borderRadius: '20px',
+               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.03)',
+               padding: '24px',
+               cursor: isDraggingBoard ? 'grabbing' : 'grab',
+               userSelect: 'none',
+               zIndex: 100
+             }}
+           >
+             {/* Color Palette Section */}
+             <div style={{ marginBottom: '20px' }}>
+               <h3 style={{
+                 fontSize: '16px',
+                 fontWeight: '500',
+                 color: '#9ca3af',
+                 margin: '0 0 16px 0',
+                 fontFamily: 'Red Hat Display',
+                 display: 'flex',
+                 alignItems: 'center',
+                 gap: '8px'
+               }}>
+                 Color Palette
+               </h3>
+               <div style={{
+                 display: 'grid',
+                 gridTemplateColumns: 'repeat(5, 1fr)',
+                 gap: '8px'
+               }}>
+                 <div style={{
+                   backgroundColor: '#C65500',
+                   borderRadius: '12px',
+                   height: '60px',
+                   display: 'flex',
+                   flexDirection: 'column',
+                   justifyContent: 'flex-end',
+                   padding: '8px',
+                   color: '#fff',
+                   fontSize: '10px',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   <div style={{ fontWeight: '500', marginBottom: '2px' }}>Burnt Orange</div>
+                   <div style={{ opacity: 0.8 }}>#C65500</div>
+                 </div>
+                 <div style={{
+                   backgroundColor: '#4B5E2E',
+                   borderRadius: '12px',
+                   height: '60px',
+                   display: 'flex',
+                   flexDirection: 'column',
+                   justifyContent: 'flex-end',
+                   padding: '8px',
+                   color: '#fff',
+                   fontSize: '10px',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   <div style={{ fontWeight: '500', marginBottom: '2px' }}>Deep Moss</div>
+                   <div style={{ opacity: 0.8 }}>#4B5E2E</div>
+                 </div>
+                 <div style={{
+                   backgroundColor: '#D4AF37',
+                   borderRadius: '12px',
+                   height: '60px',
+                   display: 'flex',
+                   flexDirection: 'column',
+                   justifyContent: 'flex-end',
+                   padding: '8px',
+                   color: '#fff',
+                   fontSize: '10px',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   <div style={{ fontWeight: '500', marginBottom: '2px' }}>Faded Mustard</div>
+                   <div style={{ opacity: 0.8 }}>#D4AF37</div>
+                 </div>
+                 <div style={{
+                   backgroundColor: '#F5E6D0',
+                   borderRadius: '12px',
+                   height: '60px',
+                   display: 'flex',
+                   flexDirection: 'column',
+                   justifyContent: 'flex-end',
+                   padding: '8px',
+                   color: '#333',
+                   fontSize: '10px',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   <div style={{ fontWeight: '500', marginBottom: '2px' }}>Warm Beige</div>
+                   <div style={{ opacity: 0.7 }}>#F5E6D0</div>
+                 </div>
+                 <div style={{
+                   backgroundColor: '#2E4E3F',
+                   borderRadius: '12px',
+                   height: '60px',
+                   display: 'flex',
+                   flexDirection: 'column',
+                   justifyContent: 'flex-end',
+                   padding: '8px',
+                   color: '#fff',
+                   fontSize: '10px',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   <div style={{ fontWeight: '500', marginBottom: '2px' }}>Forest Green</div>
+                   <div style={{ opacity: 0.8 }}>#2E4E3F</div>
+                 </div>
+               </div>
+             </div>
+
+             {/* Subtle Divider */}
+             <div style={{
+               height: '1px',
+               backgroundColor: '#f3f4f6',
+               margin: '0 0 20px 0'
+             }} />
+
+             {/* Typography Section */}
+             <div style={{ marginBottom: '20px' }}>
+               <h3 style={{
+                 fontSize: '16px',
+                 fontWeight: '500',
+                 color: '#9ca3af',
+                 margin: '0 0 16px 0',
+                 fontFamily: 'Red Hat Display',
+                 display: 'flex',
+                 alignItems: 'center',
+                 gap: '8px'
+               }}>
+                 Typography
+               </h3>
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                 <div>
+                   <div style={{
+                     fontSize: '24px',
+                     fontWeight: '600',
+                     color: '#111',
+                     fontFamily: 'Red Hat Display',
+                     marginBottom: '4px'
+                   }}>
+                     Cooper Black
+                   </div>
+                   <div style={{
+                     fontSize: '12px',
+                     color: '#9ca3af',
+                     fontFamily: 'Red Hat Display'
+                   }}>
+                     Titles / Hero
+                   </div>
+                 </div>
+                 <div>
+                   <div style={{
+                     fontSize: '20px',
+                     fontWeight: '600',
+                     color: '#111',
+                     fontFamily: 'Red Hat Display',
+                     marginBottom: '4px'
+                   }}>
+                     Courier Prime
+                   </div>
+                   <div style={{
+                     fontSize: '12px',
+                     color: '#9ca3af',
+                     fontFamily: 'Red Hat Display'
+                   }}>
+                     Subheaders / Quotes
+                   </div>
+                 </div>
+                 <div>
+                   <div style={{
+                     fontSize: '18px',
+                     fontWeight: '400',
+                     color: '#111',
+                     fontFamily: 'serif',
+                     marginBottom: '4px'
+                   }}>
+                     Quattrocento Serif
+                   </div>
+                   <div style={{
+                     fontSize: '12px',
+                     color: '#9ca3af',
+                     fontFamily: 'Red Hat Display'
+                   }}>
+                     Body Text / Elegant captions
+                   </div>
+                 </div>
+               </div>
+             </div>
+
+             {/* Subtle Divider */}
+             <div style={{
+               height: '1px',
+               backgroundColor: '#f3f4f6',
+               margin: '0 0 20px 0'
+             }} />
+
+             {/* Image Inspiration Section */}
+             <div>
+               <h3 style={{
+                 fontSize: '16px',
+                 fontWeight: '500',
+                 color: '#9ca3af',
+                 margin: '0 0 16px 0',
+                 fontFamily: 'Red Hat Display'
+               }}>
+                 Image Inspiration
+               </h3>
+               <div style={{
+                 display: 'grid',
+                 gridTemplateColumns: '1fr 1fr',
+                 gap: '12px'
+               }}>
+                 {/* Left Column */}
+                 <div style={{
+                   display: 'grid',
+                   gridTemplateColumns: '1fr',
+                   gridTemplateRows: '280px 140px 140px 140px',
+                   gap: '8px'
+                 }}>
+                   {/* Large tall image with heart */}
+                   <div style={{
+                     backgroundColor: '#8B4513',
+                     borderRadius: '12px',
+                     backgroundImage: 'linear-gradient(45deg, #D2691E, #8B4513)',
+                     position: 'relative'
+                   }}>
+                     <div style={{
+                       position: 'absolute',
+                       top: '12px',
+                       right: '12px',
+                       width: '32px',
+                       height: '32px',
+                       backgroundColor: 'rgba(255,255,255,0.9)',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center'
+                     }}>
+                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                     </div>
+                   </div>
+                   
+                   <div style={{
+                     backgroundColor: '#2F4F4F',
+                     borderRadius: '12px',
+                     backgroundImage: 'linear-gradient(45deg, #2F4F4F, #708090)',
+                     position: 'relative'
+                   }}>
+                     <div style={{
+                       position: 'absolute',
+                       top: '12px',
+                       right: '12px',
+                       width: '32px',
+                       height: '32px',
+                       backgroundColor: 'rgba(255,255,255,0.9)',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center'
+                     }}>
+                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                     </div>
+                   </div>
+                   
+                   <div style={{
+                     backgroundColor: '#D2B48C',
+                     borderRadius: '12px',
+                     backgroundImage: 'linear-gradient(45deg, #DEB887, #D2B48C)',
+                     position: 'relative'
+                   }}>
+                     <div style={{
+                       position: 'absolute',
+                       top: '12px',
+                       right: '12px',
+                       width: '32px',
+                       height: '32px',
+                       backgroundColor: 'rgba(255,255,255,0.9)',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center'
+                     }}>
+                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                     </div>
+                   </div>
+                   
+                   <div style={{
+                     backgroundColor: '#CD853F',
+                     borderRadius: '12px',
+                     backgroundImage: 'linear-gradient(45deg, #F4A460, #CD853F)',
+                     position: 'relative'
+                   }}>
+                     <div style={{
+                       position: 'absolute',
+                       top: '12px',
+                       right: '12px',
+                       width: '32px',
+                       height: '32px',
+                       backgroundColor: 'rgba(255,255,255,0.9)',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center'
+                     }}>
+                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                     </div>
+                   </div>
+                 </div>
+
+                 {/* Right Column */}
+                 <div style={{
+                   display: 'grid',
+                   gridTemplateColumns: '1fr',
+                   gridTemplateRows: '140px 140px 140px 280px',
+                   gap: '8px'
+                 }}>
+                   <div style={{
+                     backgroundColor: '#8FBC8F',
+                     borderRadius: '12px',
+                     backgroundImage: 'linear-gradient(45deg, #90EE90, #8FBC8F)',
+                     position: 'relative'
+                   }}>
+                     <div style={{
+                       position: 'absolute',
+                       top: '12px',
+                       right: '12px',
+                       width: '32px',
+                       height: '32px',
+                       backgroundColor: 'rgba(255,255,255,0.9)',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center'
+                     }}>
+                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                     </div>
+                   </div>
+                   
+                   <div style={{
+                     backgroundColor: '#A0522D',
+                     borderRadius: '12px',
+                     backgroundImage: 'linear-gradient(45deg, #D2691E, #A0522D)',
+                     position: 'relative'
+                   }}>
+                     <div style={{
+                       position: 'absolute',
+                       top: '12px',
+                       right: '12px',
+                       width: '32px',
+                       height: '32px',
+                       backgroundColor: 'rgba(255,255,255,0.9)',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center'
+                     }}>
+                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                     </div>
+                   </div>
+                   
+                   <div style={{
+                     backgroundColor: '#696969',
+                     borderRadius: '12px',
+                     backgroundImage: 'linear-gradient(45deg, #A9A9A9, #696969)',
+                     position: 'relative'
+                   }}>
+                     <div style={{
+                       position: 'absolute',
+                       top: '12px',
+                       right: '12px',
+                       width: '32px',
+                       height: '32px',
+                       backgroundColor: 'rgba(255,255,255,0.9)',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center'
+                     }}>
+                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                     </div>
+                   </div>
+                   
+                   {/* Large tall image with heart */}
+                   <div style={{
+                     backgroundColor: '#DAA520',
+                     borderRadius: '12px',
+                     backgroundImage: 'linear-gradient(45deg, #FFD700, #DAA520)',
+                     position: 'relative'
+                   }}>
+                     <div style={{
+                       position: 'absolute',
+                       top: '12px',
+                       right: '12px',
+                       width: '32px',
+                       height: '32px',
+                       backgroundColor: 'rgba(255,255,255,0.9)',
+                       borderRadius: '50%',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center'
+                     }}>
+                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
         </div>
       </div>
 

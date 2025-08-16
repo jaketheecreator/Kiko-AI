@@ -9,13 +9,15 @@ interface TopRightNavProps {
   onLightModeToggle?: () => void;
   onSettingsClick?: () => void;
   onProfileClick?: () => void;
+  style?: React.CSSProperties;
 }
 
 const TopRightNav: React.FC<TopRightNavProps> = ({
   credits = "500/1000 Credits",
   onLightModeToggle,
   onSettingsClick,
-  onProfileClick
+  onProfileClick,
+  style
 }) => {
   return (
     <div style={{
@@ -25,7 +27,8 @@ const TopRightNav: React.FC<TopRightNavProps> = ({
       display: 'flex',
       alignItems: 'center',
       gap: '16px',
-      zIndex: 1000
+      zIndex: 1000,
+      ...style
     }}>
       {/* Credits */}
       <div style={{

@@ -56,7 +56,8 @@ function Homepage() {
         borderRadius: '16px',
         padding: '18px', // Reduced by 10% from 20px
                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)',
-        zIndex: 1000
+        zIndex: 1000,
+        animation: 'slideInLeft 0.8s ease-out'
       }}>
                  {/* Logo with KIKO text */}
          <div style={{
@@ -162,6 +163,7 @@ function Homepage() {
         onLightModeToggle={() => console.log('Light mode toggled')}
         onSettingsClick={() => console.log('Settings clicked')}
         onProfileClick={() => console.log('Profile clicked')}
+        style={{ animation: 'slideInRight 0.8s ease-out 0.2s both' }}
       />
 
       {/* Main Content */}
@@ -178,7 +180,8 @@ function Homepage() {
                  {/* Hero Section */}
          <div style={{
            textAlign: 'center',
-           marginBottom: '0px'
+           marginBottom: '0px',
+           animation: 'fadeInUp 1s ease-out 0.4s both'
          }}>
                        <h1 style={{
               fontSize: '64px',
@@ -217,7 +220,8 @@ function Homepage() {
           width: '740px',
           height: '180px',
           marginBottom: '40px',
-          margin: '0 auto 40px auto'
+          margin: '0 auto 40px auto',
+          animation: 'fadeInScale 1.2s ease-out 0.8s both'
         }}>
           {/* Card 1 - Retro Vibe */}
           <div 
@@ -464,7 +468,8 @@ function Homepage() {
         borderRadius: '16px',
         padding: '20px',
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.04)',
-        zIndex: 1000
+        zIndex: 1000,
+        animation: 'slideInUp 1s ease-out 1.2s both'
       }}>
         {/* Input Field */}
         <input
@@ -570,7 +575,8 @@ function Homepage() {
         transform: 'translateX(-50%)', // Center perfectly
         fontSize: '14px',
         color: '#9ca3af',
-        fontFamily: 'Red Hat Display, sans-serif'
+        fontFamily: 'Red Hat Display, sans-serif',
+        animation: 'fadeIn 1s ease-out 1.6s both'
       }}>
         Built with Love from Juggernaut
       </div>
@@ -580,6 +586,70 @@ function Homepage() {
           @keyframes recordingPulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
+          }
+
+          @keyframes slideInLeft {
+            0% {
+              opacity: 0;
+              transform: translateX(-50px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+
+          @keyframes slideInRight {
+            0% {
+              opacity: 0;
+              transform: translateX(50px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+
+          @keyframes fadeInUp {
+            0% {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes slideInUp {
+            0% {
+              opacity: 0;
+              transform: translateX(-50%) translateY(30px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateX(-50%) translateY(0);
+            }
+          }
+
+          @keyframes fadeInScale {
+            0% {
+              opacity: 0;
+              transform: scale(0.9);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+
+          @keyframes fadeIn {
+            0% {
+              opacity: 0;
+            }
+            100% {
+              opacity: 1;
+            }
           }
         `}
       </style>

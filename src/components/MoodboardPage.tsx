@@ -4,6 +4,7 @@ import Grid from '../assets/images/Grid.png';
 import Plus from '../assets/icons/plus.png';
 import ArrowLeft from '../assets/icons/ArrowLeft.png';
 import Heart from '../assets/icons/Heart.png';
+import Trash from '../assets/icons/Trash.png';
 import TopRightNav from './TopRightNav';
 import ChatPanel from './ChatPanel';
 
@@ -17,8 +18,49 @@ function MoodboardPage() {
   const [isDraggingBoard, setIsDraggingBoard] = useState(false);
   const [boardDragStart, setBoardDragStart] = useState({ x: 0, y: 0 });
   const [activeTab, setActiveTab] = useState('Images');
+
+  // Mock image data
+  const initialCenterImages = [
+    { id: 1, color: '#8B4513', gradient: 'linear-gradient(45deg, #D2691E, #8B4513)', type: 'tall', position: 'left-1' },
+    { id: 2, color: '#2F4F4F', gradient: 'linear-gradient(45deg, #2F4F4F, #708090)', type: 'medium', position: 'left-2' },
+    { id: 3, color: '#D2B48C', gradient: 'linear-gradient(45deg, #DEB887, #D2B48C)', type: 'medium', position: 'left-3' },
+    { id: 4, color: '#CD853F', gradient: 'linear-gradient(45deg, #F4A460, #CD853F)', type: 'medium', position: 'left-4' },
+    { id: 5, color: '#8FBC8F', gradient: 'linear-gradient(45deg, #90EE90, #8FBC8F)', type: 'medium', position: 'right-1' },
+    { id: 6, color: '#A0522D', gradient: 'linear-gradient(45deg, #D2691E, #A0522D)', type: 'medium', position: 'right-2' },
+    { id: 7, color: '#696969', gradient: 'linear-gradient(45deg, #A9A9A9, #696969)', type: 'medium', position: 'right-3' },
+    { id: 8, color: '#DAA520', gradient: 'linear-gradient(45deg, #FFD700, #DAA520)', type: 'tall', position: 'right-4' }
+  ];
+
+  // Image type definition
+  type ImageData = {
+    id: number;
+    color: string;
+    gradient: string;
+    type: string;
+    position: string;
+  };
+
+  const [centerImages, setCenterImages] = useState<ImageData[]>(initialCenterImages);
+  const [rightBoardImages, setRightBoardImages] = useState<ImageData[]>([]);
   const canvasRef = useRef(null);
   const navigate = useNavigate();
+
+  // Transfer functions
+  const moveToBoard = useCallback((imageId: number) => {
+    const imageToMove = centerImages.find(img => img.id === imageId);
+    if (imageToMove) {
+      setCenterImages(prev => prev.filter(img => img.id !== imageId));
+      setRightBoardImages(prev => [...prev, imageToMove]);
+    }
+  }, [centerImages]);
+
+  const moveToInspiration = useCallback((imageId: number) => {
+    const imageToMove = rightBoardImages.find(img => img.id === imageId);
+    if (imageToMove) {
+      setRightBoardImages(prev => prev.filter(img => img.id !== imageId));
+      setCenterImages(prev => [...prev, imageToMove]);
+    }
+  }, [rightBoardImages]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.target === canvasRef.current) {
@@ -308,39 +350,64 @@ function MoodboardPage() {
                  "wide top1R"
                `
              }}>
-               {/* Left column - proper bento */}
-               <div style={{
-                 gridArea: 'top1',
-                 backgroundColor: '#f3f4f6',
-                 borderRadius: '12px'
-               }} />
-               <div style={{
-                 gridArea: 'tall',
-                 backgroundColor: '#f3f4f6',
-                 borderRadius: '12px'
-               }} />
-               <div style={{
-                 gridArea: 'wide',
-                 backgroundColor: '#f3f4f6',
-                 borderRadius: '12px'
-               }} />
+               {/* Always show skeleton/placeholder grid */}
+               <>
+                 <div style={{ gridArea: 'top1', backgroundColor: '#f3f4f6', borderRadius: '12px' }} />
+                 <div style={{ gridArea: 'tall', backgroundColor: '#f3f4f6', borderRadius: '12px' }} />
+                 <div style={{ gridArea: 'wide', backgroundColor: '#f3f4f6', borderRadius: '12px' }} />
+                 <div style={{ gridArea: 'top1R', backgroundColor: '#f3f4f6', borderRadius: '12px' }} />
+                 <div style={{ gridArea: 'tallR', backgroundColor: '#f3f4f6', borderRadius: '12px' }} />
+                 <div style={{ gridArea: 'wideR', backgroundColor: '#f3f4f6', borderRadius: '12px' }} />
+               </>
                
-               {/* Right column - same style as left */}
-               <div style={{
-                 gridArea: 'top1R',
-                 backgroundColor: '#f3f4f6',
-                 borderRadius: '12px'
-               }} />
-               <div style={{
-                 gridArea: 'tallR',
-                 backgroundColor: '#f3f4f6',
-                 borderRadius: '12px'
-               }} />
-               <div style={{
-                 gridArea: 'wideR',
-                 backgroundColor: '#f3f4f6',
-                 borderRadius: '12px'
-               }} />
+               {/* Overlay liked images on top of skeleton */}
+               {rightBoardImages.map((image, index) => {
+                 const gridAreas = ['top1', 'tall', 'wide', 'top1R', 'tallR', 'wideR'];
+                 const gridArea = gridAreas[index % gridAreas.length];
+                 
+                 return (
+                   <div key={`right-${image.id}`} style={{
+                     gridArea: gridArea,
+                     backgroundColor: image.color,
+                     backgroundImage: image.gradient,
+                     borderRadius: '12px',
+                     position: 'relative',
+                     cursor: 'pointer',
+                     opacity: 1,
+                     transform: 'scale(1)',
+                     transition: 'all 0.3s ease'
+                   }}>
+                     <div 
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         moveToInspiration(image.id);
+                       }}
+                       style={{
+                         position: 'absolute',
+                         top: '8px',
+                         left: '8px',
+                         width: '28px',
+                         height: '28px',
+                         backgroundColor: 'rgba(255,255,255,0.9)',
+                         borderRadius: '50%',
+                         display: 'flex',
+                         alignItems: 'center',
+                         justifyContent: 'center',
+                         cursor: 'pointer',
+                         transition: 'transform 0.2s ease'
+                       }}
+                       onMouseEnter={(e) => {
+                         (e.target as HTMLElement).style.transform = 'scale(1.1)';
+                       }}
+                       onMouseLeave={(e) => {
+                         (e.target as HTMLElement).style.transform = 'scale(1)';
+                       }}
+                     >
+                       <img src={Trash} alt="Trash" style={{ width: '14px', height: '14px' }} />
+                     </div>
+                   </div>
+                 );
+               })}
              </div>
            )}
 
@@ -750,217 +817,123 @@ function MoodboardPage() {
                margin: '0 0 20px 0'
              }} />
 
-             {/* Image Inspiration Section */}
-             <div>
-               <h3 style={{
-                 fontSize: '16px',
-                 fontWeight: '500',
-                 color: '#9ca3af',
-                 margin: '0 0 16px 0',
-                 fontFamily: 'Red Hat Display'
-               }}>
-                 Image Inspiration
-               </h3>
-               <div style={{
-                 display: 'grid',
-                 gridTemplateColumns: '1fr 1fr',
-                 gap: '12px'
-               }}>
-                 {/* Left Column */}
-                 <div style={{
-                   display: 'grid',
-                   gridTemplateColumns: '1fr',
-                   gridTemplateRows: '280px 140px 140px 140px',
-                   gap: '8px'
-                 }}>
-                   {/* Large tall image with heart */}
-                   <div style={{
-                     backgroundColor: '#8B4513',
-                     borderRadius: '12px',
-                     backgroundImage: 'linear-gradient(45deg, #D2691E, #8B4513)',
-                     position: 'relative'
-                   }}>
-                     <div style={{
-                       position: 'absolute',
-                       top: '12px',
-                       right: '12px',
-                       width: '32px',
-                       height: '32px',
-                       backgroundColor: 'rgba(255,255,255,0.9)',
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center'
-                     }}>
-                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
-                     </div>
-                   </div>
-                   
-                   <div style={{
-                     backgroundColor: '#2F4F4F',
-                     borderRadius: '12px',
-                     backgroundImage: 'linear-gradient(45deg, #2F4F4F, #708090)',
-                     position: 'relative'
-                   }}>
-                     <div style={{
-                       position: 'absolute',
-                       top: '12px',
-                       right: '12px',
-                       width: '32px',
-                       height: '32px',
-                       backgroundColor: 'rgba(255,255,255,0.9)',
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center'
-                     }}>
-                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
-                     </div>
-                   </div>
-                   
-                   <div style={{
-                     backgroundColor: '#D2B48C',
-                     borderRadius: '12px',
-                     backgroundImage: 'linear-gradient(45deg, #DEB887, #D2B48C)',
-                     position: 'relative'
-                   }}>
-                     <div style={{
-                       position: 'absolute',
-                       top: '12px',
-                       right: '12px',
-                       width: '32px',
-                       height: '32px',
-                       backgroundColor: 'rgba(255,255,255,0.9)',
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center'
-                     }}>
-                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
-                     </div>
-                   </div>
-                   
-                   <div style={{
-                     backgroundColor: '#CD853F',
-                     borderRadius: '12px',
-                     backgroundImage: 'linear-gradient(45deg, #F4A460, #CD853F)',
-                     position: 'relative'
-                   }}>
-                     <div style={{
-                       position: 'absolute',
-                       top: '12px',
-                       right: '12px',
-                       width: '32px',
-                       height: '32px',
-                       backgroundColor: 'rgba(255,255,255,0.9)',
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center'
-                     }}>
-                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
-                     </div>
-                   </div>
-                 </div>
+                         {/* Image Inspiration Section */}
+            <div>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '500',
+                color: '#9ca3af',
+                margin: '0 0 16px 0',
+                fontFamily: 'Red Hat Display'
+              }}>
+                Image Inspiration
+              </h3>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px'
+              }}>
+                {/* Left Column */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr',
+                  gridTemplateRows: '280px 140px 140px 140px',
+                  gap: '8px'
+                }}>
+                  {centerImages.filter(img => img.position.startsWith('left')).map((image, index) => (
+                    <div key={image.id} style={{
+                      backgroundColor: image.color,
+                      borderRadius: '12px',
+                      backgroundImage: image.gradient,
+                      position: 'relative',
+                      cursor: 'pointer',
+                      opacity: 1,
+                      transform: 'scale(1)',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          moveToBoard(image.id);
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: '12px',
+                          width: '32px',
+                          height: '32px',
+                          backgroundColor: 'rgba(255,255,255,0.9)',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          transition: 'transform 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.target as HTMLElement).style.transform = 'scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.target as HTMLElement).style.transform = 'scale(1)';
+                        }}
+                      >
+                        <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-                 {/* Right Column */}
-                 <div style={{
-                   display: 'grid',
-                   gridTemplateColumns: '1fr',
-                   gridTemplateRows: '140px 140px 140px 280px',
-                   gap: '8px'
-                 }}>
-                   <div style={{
-                     backgroundColor: '#8FBC8F',
-                     borderRadius: '12px',
-                     backgroundImage: 'linear-gradient(45deg, #90EE90, #8FBC8F)',
-                     position: 'relative'
-                   }}>
-                     <div style={{
-                       position: 'absolute',
-                       top: '12px',
-                       right: '12px',
-                       width: '32px',
-                       height: '32px',
-                       backgroundColor: 'rgba(255,255,255,0.9)',
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center'
-                     }}>
-                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
-                     </div>
-                   </div>
-                   
-                   <div style={{
-                     backgroundColor: '#A0522D',
-                     borderRadius: '12px',
-                     backgroundImage: 'linear-gradient(45deg, #D2691E, #A0522D)',
-                     position: 'relative'
-                   }}>
-                     <div style={{
-                       position: 'absolute',
-                       top: '12px',
-                       right: '12px',
-                       width: '32px',
-                       height: '32px',
-                       backgroundColor: 'rgba(255,255,255,0.9)',
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center'
-                     }}>
-                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
-                     </div>
-                   </div>
-                   
-                   <div style={{
-                     backgroundColor: '#696969',
-                     borderRadius: '12px',
-                     backgroundImage: 'linear-gradient(45deg, #A9A9A9, #696969)',
-                     position: 'relative'
-                   }}>
-                     <div style={{
-                       position: 'absolute',
-                       top: '12px',
-                       right: '12px',
-                       width: '32px',
-                       height: '32px',
-                       backgroundColor: 'rgba(255,255,255,0.9)',
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center'
-                     }}>
-                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
-                     </div>
-                   </div>
-                   
-                   {/* Large tall image with heart */}
-                   <div style={{
-                     backgroundColor: '#DAA520',
-                     borderRadius: '12px',
-                     backgroundImage: 'linear-gradient(45deg, #FFD700, #DAA520)',
-                     position: 'relative'
-                   }}>
-                     <div style={{
-                       position: 'absolute',
-                       top: '12px',
-                       right: '12px',
-                       width: '32px',
-                       height: '32px',
-                       backgroundColor: 'rgba(255,255,255,0.9)',
-                       borderRadius: '50%',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center'
-                     }}>
-                       <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
-                     </div>
-                   </div>
-                 </div>
-               </div>
-             </div>
+                {/* Right Column */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr',
+                  gridTemplateRows: '140px 140px 140px 280px',
+                  gap: '8px'
+                }}>
+                  {centerImages.filter(img => img.position.startsWith('right')).map((image, index) => (
+                    <div key={image.id} style={{
+                      backgroundColor: image.color,
+                      borderRadius: '12px',
+                      backgroundImage: image.gradient,
+                      position: 'relative',
+                      cursor: 'pointer',
+                      opacity: 1,
+                      transform: 'scale(1)',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          moveToBoard(image.id);
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: '12px',
+                          width: '32px',
+                          height: '32px',
+                          backgroundColor: 'rgba(255,255,255,0.9)',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          transition: 'transform 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.target as HTMLElement).style.transform = 'scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.target as HTMLElement).style.transform = 'scale(1)';
+                        }}
+                      >
+                        <img src={Heart} alt="Heart" style={{ width: '18px', height: '18px' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
            </div>
         </div>
       </div>

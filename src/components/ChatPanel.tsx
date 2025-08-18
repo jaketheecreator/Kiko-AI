@@ -17,6 +17,7 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isThinking, setIsThinking] = useState(false);
 
   // Load messages from chatData when it changes
   useEffect(() => {
@@ -27,7 +28,7 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
     }
   }, [chatData]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputValue.trim() && chatData) {
       // Create user message
       const userMessage: ChatMessage = {
@@ -37,22 +38,40 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
         timestamp: Date.now()
       };
 
-      // Create assistant reply
-      const assistantMessage = generateAssistantReply(inputValue.trim());
-
-      // Update messages state (add to filtered messages for display)
-      const newMessages = [...messages, userMessage, assistantMessage];
-      setMessages(newMessages);
-
-      // Update chatData and save to localStorage (add to full chatData.messages)
-      const updatedChatData: ChatData = {
-        ...chatData,
-        messages: [...chatData.messages, userMessage, assistantMessage]
-      };
-      saveChatData(updatedChatData);
-
-      // Clear input
+      // Clear input immediately
+      const messageText = inputValue.trim();
       setInputValue('');
+
+      // Add user message first
+      const updatedMessagesWithUser = [...messages, userMessage];
+      setMessages(updatedMessagesWithUser);
+
+      // Update chatData with user message
+      const chatDataWithUser: ChatData = {
+        ...chatData,
+        messages: [...chatData.messages, userMessage]
+      };
+      saveChatData(chatDataWithUser);
+
+      // Show thinking state
+      setIsThinking(true);
+
+      // Generate assistant reply using real API
+      const assistantMessage = await generateAssistantReply(messageText, chatData.messages);
+
+      // Hide thinking state
+      setIsThinking(false);
+
+      // Add assistant message
+      const finalMessages = [...updatedMessagesWithUser, assistantMessage];
+      setMessages(finalMessages);
+
+      // Update chatData with assistant message
+      const finalChatData: ChatData = {
+        ...chatDataWithUser,
+        messages: [...chatDataWithUser.messages, assistantMessage]
+      };
+      saveChatData(finalChatData);
     }
   };
 
@@ -74,6 +93,20 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
       flexDirection: 'column',
       overflow: 'hidden'
     }}>
+      <style>
+        {`
+          @keyframes thinking {
+            0%, 60%, 100% {
+              transform: translateY(0);
+              opacity: 0.4;
+            }
+            30% {
+              transform: translateY(-10px);
+              opacity: 1;
+            }
+          }
+        `}
+      </style>
       {/* Header with Title Pill */}
       <div style={{
         padding: '24px 24px 16px 24px',
@@ -81,10 +114,12 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
       }}>
         <div style={{
           backgroundColor: '#f8f9fa',
-          borderRadius: '50px',
+          borderRadius: '16px',
           padding: '12px 20px',
           display: 'inline-block',
-          whiteSpace: 'nowrap'
+          maxWidth: '100%',
+          wordWrap: 'break-word',
+          whiteSpace: 'normal'
         }}>
                      <span style={{
              fontSize: '14px',
@@ -130,8 +165,10 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
              margin: 0,
              fontFamily: 'Red Hat Display'
            }}>
-             Think warm lighting, mismatched furniture, vintage posters, and the smell of espresso in the air.
-             Inspired by Friends-era aesthetics with a nostalgic, soft vibe.
+             {chatData?.idea ? 
+               `I'm excited about your ${chatData.idea.toLowerCase()} idea! This moodboard is going to be amazing.` :
+               'Think warm lighting, mismatched furniture, vintage posters, and the smell of espresso in the air. Inspired by Friends-era aesthetics with a nostalgic, soft vibe.'
+             }
            </p>
         </div>
 
@@ -162,8 +199,10 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
              margin: 0,
              fontFamily: 'Red Hat Display'
            }}>
-             A space that feels like a second home — where jazz plays softly in the background, and every corner
-             invites you to slow down, read, or write in your journal.
+             {chatData?.idea ? 
+               `The ${chatData.idea.toLowerCase()} aesthetic will create such a special atmosphere.` :
+               'A space that feels like a second home — where jazz plays softly in the background, and every corner invites you to slow down, read, or write in your journal.'
+             }
            </p>
         </div>
 
@@ -282,6 +321,60 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
                </div>
              </div>
            ))}
+           
+           {/* Thinking Animation */}
+           {isThinking && (
+             <div style={{
+               display: 'flex',
+               justifyContent: 'flex-start',
+               width: '100%',
+               marginBottom: '16px'
+             }}>
+               <div style={{
+                 display: 'flex',
+                 alignItems: 'center',
+                 gap: '8px',
+                 padding: '12px 16px',
+                 backgroundColor: '#f8f9fa',
+                 borderRadius: '18px',
+                 maxWidth: '80%'
+               }}>
+                 <div style={{
+                   display: 'flex',
+                   gap: '4px'
+                 }}>
+                   <div style={{
+                     width: '8px',
+                     height: '8px',
+                     borderRadius: '50%',
+                     backgroundColor: '#9CA3AF',
+                     animation: 'thinking 1.4s infinite ease-in-out'
+                   }} />
+                   <div style={{
+                     width: '8px',
+                     height: '8px',
+                     borderRadius: '50%',
+                     backgroundColor: '#9CA3AF',
+                     animation: 'thinking 1.4s infinite ease-in-out 0.2s'
+                   }} />
+                   <div style={{
+                     width: '8px',
+                     height: '8px',
+                     borderRadius: '50%',
+                     backgroundColor: '#9CA3AF',
+                     animation: 'thinking 1.4s infinite ease-in-out 0.4s'
+                   }} />
+                 </div>
+                 <span style={{
+                   fontSize: '14px',
+                   color: '#6B7280',
+                   fontFamily: 'Red Hat Display'
+                 }}>
+                   Thinking...
+                 </span>
+               </div>
+             </div>
+           )}
          </div>
        </div>
 

@@ -107,37 +107,37 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
           }
         `}
       </style>
-      {/* Header with Title Pill */}
-      <div style={{
-        padding: '24px 24px 16px 24px',
-        textAlign: 'right'
-      }}>
-        <div style={{
-          backgroundColor: '#f8f9fa',
-          borderRadius: '16px',
-          padding: '12px 20px',
-          display: 'inline-block',
-          maxWidth: '100%',
-          wordWrap: 'break-word',
-          whiteSpace: 'normal'
-        }}>
-                     <span style={{
-             fontSize: '14px',
-             fontWeight: '600',
-             color: '#374151',
-             fontFamily: 'Red Hat Display'
-           }}>
-             {chatData?.idea || 'Loading...'}
-           </span>
-        </div>
-      </div>
-
       {/* Content Body */}
       <div style={{
         flex: 1,
         padding: '0 24px',
         overflowY: 'auto'
       }}>
+        {/* Header with Title Pill */}
+        <div style={{
+          padding: '24px 0 16px 0',
+          textAlign: 'right',
+          marginBottom: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#f8f9fa',
+            borderRadius: '16px',
+            padding: '12px 20px',
+            display: 'inline-block',
+            maxWidth: '100%',
+            wordWrap: 'break-word',
+            whiteSpace: 'normal'
+          }}>
+                       <span style={{
+               fontSize: '14px',
+               fontWeight: '600',
+               color: '#374151',
+               fontFamily: 'Red Hat Display'
+             }}>
+               {chatData?.idea || 'Loading...'}
+             </span>
+          </div>
+        </div>
         {/* Mood Summary Section */}
         <div style={{
           marginBottom: '20px'
@@ -206,7 +206,8 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
            </p>
         </div>
 
-                 {/* Interactive Icons */}
+                 {/* Interactive Icons - Only show after AI replies */}
+         {messages.length > 0 && (
          <div style={{
            display: 'flex',
            gap: '16px',
@@ -292,6 +293,7 @@ const ChatPanel: React.FC<Props> = ({ onBack, chatData }) => {
               onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
             />
          </div>
+         )}
 
          {/* Chat Messages */}
          <div style={{

@@ -22,7 +22,17 @@ app.post('/api/chat', async (req, res) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     
     const { message } = req.body;
-    const prompt = `You are a creative assistant helping users create moodboards. User message: ${message}. Provide helpful, creative guidance for their moodboard project.`;
+    const prompt = `You are a creative assistant helping users create moodboards. 
+
+IMPORTANT: Do NOT repeat or mirror the user's message back to them. Do NOT treat questions like "are you sure?" as moodboard concepts.
+
+If the user asks a question like "are you sure?" or "hello", give a natural, direct answer.
+
+If the user describes a moodboard idea, provide creative guidance.
+
+User message: ${message}
+
+Respond naturally without repeating their words.`;
     
     const result = await model.generateContent(prompt);
     const text = result.response.text();
